@@ -11,9 +11,7 @@
   "dependencies": {
     "node-fetch": "^1.6.0",
     "pg": "^6.1.0",
-    "xml2js": "^0.4.17"
-  },
-  "devDependencies": {
+    "xml2js": "^0.4.17",
     "dotenv": "^2.0.0"
   }
 }
