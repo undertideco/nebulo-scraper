@@ -1,4 +1,4 @@
-const pg = require('pg')
+const pg = require('pg');
 
 var config = {
   host: 'nebulov2-development.cdumdekqobqc.us-west-2.rds.amazonaws.com',
