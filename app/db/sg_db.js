@@ -22,7 +22,7 @@ module.exports = {
           callback(cityId);
           return;
         } else {
-          client.query('INSERT INTO cities(name, location) VALUES($1, st_makepoint($2, $3)) returning id', [city.name, city.long, city.lat], function(err, result) {
+          client.query('INSERT INTO cities(name, location) VALUES($1, st_makepoint($2, $3)) returning id', [city.name, city.location.lng, city.location.lat], function(err, result) {
             done();
             if (err) {
               return console.error('error running query', err);

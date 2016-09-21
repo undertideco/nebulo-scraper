@@ -28,8 +28,10 @@ module.exports = {
         return regions.map((region) => {
           return {
             name: codeMap[region.id[0]],
-            lat: region.latitude[0],
-            long: region.longitude[0],
+            location: {
+              lat: region.latitude[0],
+              lng: region.longitude[0],
+            },
             data: parseInt(region.record[0].reading[0].$.value, 10)
           }
         });
