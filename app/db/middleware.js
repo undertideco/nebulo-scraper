@@ -1,11 +1,7 @@
 const pg = require('pg');
+const config = require('./config.json')[process.env.NODE_ENV || 'dev'];
 
-var config = {
-  host: 'nebulov2-development.cdumdekqobqc.us-west-2.rds.amazonaws.com',
-  max: 10,
-  idleTimeoutMillis: 30000,
-};
-
+console.log(config);
 var pool = new pg.Pool(config);
 
 module.exports = {
@@ -13,7 +9,7 @@ module.exports = {
     pool.connect(function(err, client, done) {
       client.query('SELECT * FROM cities WHERE name = $1', [city.name], function(err, result) {
         done();
-        var cityId = result.rows[0] ? result.rows[0].id : null;
+        var cityId = result && result.rows[0] ? result.rows[0].id : null;
         if (err) {
           return console.error('error running query', err);
         }

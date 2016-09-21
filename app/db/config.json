@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "host": "localhost",
+    "user": "nebulo_dev",
+    "password": "test",
+    "database": "nebulo_dev",
+    "port": 5432,
+    "max": 10
+  },
+  "production": {
+    "host": "nebulov2-development.cdumdekqobqc.us-west-2.rds.amazonaws.com",
+    "max": 10,
+    "idleTimeoutMillis": 30000
+  }
+}
