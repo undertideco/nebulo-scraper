@@ -30,6 +30,16 @@ module.exports = {
     });
   },
 
+  /* dispatchCity schema
+  {
+    name: ,
+    location: {
+      lat: ,
+      lng: ,
+    },
+    data:
+  }
+  */
   dispatchCity: function(city) {
     this.getCityId(city, (cityId) => {
       pool.connect(function(err, client, done) {

@@ -3,6 +3,7 @@ const db = require('../app/db/middleware');
 
 const sg = require('../app/scrapers/singapore');
 const my = require('../app/scrapers/malaysia');
+const tw = require('../app/scrapers/taiwan');
 
 sg.scrape().then(function(result){
   result.forEach(function(city) {
@@ -12,6 +13,13 @@ sg.scrape().then(function(result){
 });
 
 my.scrape().then(function(result) {
+  result.forEach(function(city) {
+    console.log(city);
+    db.dispatchCity(city);
+  });
+})
+
+tw.scrape().then(function(result) {
   result.forEach(function(city) {
     console.log(city);
     db.dispatchCity(city);
