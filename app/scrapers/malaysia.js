@@ -13,30 +13,28 @@ module.exports = {
     const numberRegex = /(\d+)/;
 
     console.log("Beginning Malaysia Scrape...");
-    console.log(this.getPageUrl());
     const _this = this;
-    return fetch(this.getPageUrl())
-      .then(function(res) {
-        return res.text();
+    return fetch(urls.MALAYSIA_URL)
+      .then((response) => {
+        return response.json();
       })
-      .then(function(htmlText) {
-        var $ = cheerio.load(htmlText);
-        const citiesData = $('section#content table tr').map(function(row_idx, row) {
+      .then((json) => {
+        const cities = json["24hour_api"];
+        cities.shift();
+        console.log(cities);
+        return cities.map((city) => {
           var obj = {}
-          const columns = $(this).children().filter(function(value) { return !$(this).text().isEmpty() });
-          const cityColumn = columns.first();
-          const data = columns.last().text();
+          obj.name = `${city[1]}, ${city[0].charAt(0) + city[0].substring(1).toLowerCase()}`
+          let data = city.slice(-1)[0]
 
-          obj.name = _this.getCityName(cityColumn)
           if (numberRegex.test(data)) {
             obj.data = parseInt(data.match(numberRegex)[0], 10);
           } else {
             obj.data = 0;
           }
-          return obj;
-        }).get().slice(1);
 
-        return citiesData;
+          return obj;
+        });
       })
       .then(function(citiesData) {
         let promises = citiesData.map(function(city) {
@@ -55,28 +53,5 @@ module.exports = {
             console.log(error);
           });
       });
-  },
-
-  getCityName: function(cityColumn) {
-    return `${cityColumn.next().text()}, ${cityColumn.text()}`
-  },
-
-  getPageUrl: function() {
-    const now = moment();
-    return `http://apims.doe.gov.my/v2/hour${this.getPageNumber(now)}_${now.format('YYYY-MM-DD')}.html`
-  },
-
-  getPageNumber: function(time) {
-    const hour = time.hour();
-    var pageNumber = 1;
-    if (hour >= 18) {
-      pageNumber = 4;
-    } else if (hour >= 12) {
-      pageNumber = 3;
-    } else if (hour >= 6) {
-      pageNumber = 2;
-    }
-
-    return pageNumber
   }
 }
