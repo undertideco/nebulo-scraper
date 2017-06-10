@@ -7,6 +7,9 @@ var pool = new pg.Pool(config);
 module.exports = {
   getCityId: function(city, callback) {
     pool.connect(function(err, client, done) {
+      if (err) {
+        console.log(err);
+      }
       client.query('SELECT * FROM cities WHERE name = $1', [city.name], function(err, result) {
         done();
         var cityId = result && result.rows[0] ? result.rows[0].id : null;
