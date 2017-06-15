@@ -6,12 +6,12 @@ const my = require('../app/scrapers/malaysia');
 const tw = require('../app/scrapers/taiwan');
 const hk = require('../app/scrapers/hongkong');
 
-// sg.scrape().then(function(result){
-//   result.forEach(function(city) {
-//     console.log(city);
-//     db.dispatchCity(city);
-//   });
-// });
+sg.scrape().then(function(result){
+  result.forEach(function(city) {
+    console.log(city);
+    db.dispatchCity(city);
+  });
+});
 
 my.scrape().then(function(result) {
   result.forEach(function(city) {
@@ -20,16 +20,16 @@ my.scrape().then(function(result) {
   });
 })
 
-// tw.scrape().then(function(result) {
-//   result.forEach(function(city) {
-//     console.log(city);
-//     db.dispatchCity(city);
-//   });
-// })
+tw.scrape().then(function(result) {
+  result.forEach(function(city) {
+    console.log(city);
+    db.dispatchCity(city);
+  });
+})
 
-// hk.scrape().then(function(result) {
-//   result.forEach(function(city) {
-//     console.log(city);
-//     db.dispatchCity(city);
-//   });
-// })
+hk.scrape().then(function(result) {
+  result.forEach(function(city) {
+    console.log(city);
+    db.dispatchCity(city);
+  });
+})
