@@ -11,3 +11,6 @@ It's perhaps the most lo-fi setup ever.
 ## Usage
 Literally. Don't. Feel free to use the scripts in `app/scrapers` and
 forget the rest.
+
+## License
+MIT
