@@ -1,6 +1,6 @@
 # nebulo-scraper
 
-This is the web scraper our app [Nebulo](https://getnebulo.com) uses to scrape air quality data for Singapore,
+This is the web scraper our app [Nebulo](https://nebulo.undertide.co) uses to scrape air quality data for Singapore,
 Malaysia, Taiwan, and Hong Kong.
 
 It's built to run off Heroku with a scheduled task `node
