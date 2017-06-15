@@ -9,8 +9,10 @@ bin/hurricane.js`
 It's perhaps the most lo-fi setup ever.
 
 ## Usage
-Literally. Don't. Feel free to use the scripts in `app/scrapers` and
-forget the rest.
+Literally. Don't. Feel free to use the scripts in [`app/scrapers`](https://github.com/undertideco/nebulo-scraper/tree/master/app/scrapers) and forget the rest.
+
+## Questions?
+Feel free to create an issue or @ me [@jurvistan](https://twitter.com/jurvistan/)
 
 ## License
 MIT
