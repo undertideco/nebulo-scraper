@@ -7,7 +7,9 @@
     "node": "6.2.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:setup": "psql -f sql/init.sql nebulo_dev",
+    "db:reset": "psql -f sql/reset.sql nebulo_dev"
   },
   "author": "",
   "license": "ISC",

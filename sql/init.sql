@@ -1,0 +1,14 @@
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+CREATE TABLE cities (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  location GEOGRAPHY NOT NULL
+);
+
+CREATE TABLE cities_pm25 (
+  id SERIAL PRIMARY KEY,
+  city_id INTEGER REFERENCES cities(id),
+  data INTEGER NOT NULL,
+  date_recorded TIMESTAMP DEFAULT now()
+);
