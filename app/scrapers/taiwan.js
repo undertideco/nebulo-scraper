@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const Promise = require('bluebird');
 const urls = require('../constants/urls');
 const geocoder = require('../helpers/geocoder');
 
@@ -21,16 +22,14 @@ module.exports = {
         });
       })
       .then((citiesData) => {
-        let promises = citiesData.map(function(city) {
+        return Promise.map(citiesData, (city) => {
           var cityNameLookup = geocoderExceptions[city.name] || city.name
           return geocoder.getLatLng(cityNameLookup)
             .then(function(locationObj) {
               city.location = locationObj;
               return city;
-            })
-        });
-
-        return Promise.all(promises)
+            });
+        }, { concurrency: 5 })
           .then(function(results) {
             return results;
           })
