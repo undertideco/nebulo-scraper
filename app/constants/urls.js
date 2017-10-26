@@ -5,5 +5,5 @@ module.exports = {
   MALAYSIA_URL: "http://apims.doe.gov.my/data/public/CAQM/last24hours.json",
   HONGKONG_URL:"http://www.aqhi.gov.hk/epd/ddata/html/out/24pc_Eng.xml",
   THAILAND_URL: "http://www.aqmthai.com/index.php?lang=en",
-  TAIWAN_URL: "http://opendata.epa.gov.tw/ws/Data/REWXQA/?$orderby=SiteName&$skip=0&format=json"
+  TAIWAN_URL: "http://opendata2.epa.gov.tw/AQI.json"
 }
