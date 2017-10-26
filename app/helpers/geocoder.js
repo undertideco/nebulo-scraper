@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const GOOGLE_GEOCODING_API_KEY = 'AIzaSyDQfzJijMkV_sX8Slnyv0A7J7Bsq6jAQ_o';
+const { GOOGLE_GEOCODING_API_KEY } = process.env;
 
 module.exports = {
   getLatLng: function(cityName) {
