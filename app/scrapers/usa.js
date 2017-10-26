@@ -3,30 +3,29 @@ const Promise = require('bluebird');
 const urls = require('../constants/urls');
 const geocoder = require('../helpers/geocoder');
 
-const geocoderExceptions = {
-  '安南, 臺南市': '安南'
-}
-
 module.exports = {
   scrape: () => {
-    return fetch(urls.TAIWAN_URL)
+    return fetch(urls.USA_URL)
       .then((response) => {
         return response.json();
       })
       .then((json) => {
         return json.map((city) => {
           return  {
-            name: `${city.SiteName}, ${city.County}`,
-            data: parseInt( city['PM2.5'], 10) || 0
+            name: null,
+            data: parseInt( city['AQI'], 10) || 0,
+            location: {
+              lat: city.Latitude,
+              lng: city.Longitude
+            }
           }
         });
       })
       .then((citiesData) => {
         return Promise.map(citiesData, (city) => {
-          var cityNameLookup = geocoderExceptions[city.name] || city.name
-          return geocoder.getLatLng(cityNameLookup)
-            .then(function(locationObj) {
-              city.location = locationObj;
+          return geocoder.getAddress(city.location.lat, city.location.lng)
+            .then(function(address) {
+              city.name = address;
               return city;
             });
         }, { concurrency: 5 })
