@@ -40,7 +40,6 @@ module.exports = {
               const values = citiesAirData[cityID].values;
               if (values.length > 0) {
                 const index = citiesData.findIndex(city => city.id === parseInt(cityID, 10));
-                console.log(cityID)
                 citiesData[index].data = parseInt(values[values.length - 1].value, 10);
                 delete citiesData[index].id;
               }
