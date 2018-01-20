@@ -5,6 +5,7 @@ const sg = require('../app/scrapers/singapore');
 const my = require('../app/scrapers/malaysia');
 const tw = require('../app/scrapers/taiwan');
 const hk = require('../app/scrapers/hongkong');
+const nl = require('../app/scrapers/netherlands');
 
 sg.scrape().then(function(result){
   result.forEach(function(city) {
@@ -28,6 +29,13 @@ tw.scrape().then(function(result) {
 })
 
 hk.scrape().then(function(result) {
+  result.forEach(function(city) {
+    console.log(city);
+    db.dispatchCity(city);
+  });
+})
+
+nl.scrape().then(function(result) {
   result.forEach(function(city) {
     console.log(city);
     db.dispatchCity(city);
