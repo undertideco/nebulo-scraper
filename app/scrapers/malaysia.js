@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const Promise = require('bluebird');
 const moment = require('moment');
 const cheerio = require('cheerio');
 const geocoder = require('../helpers/geocoder');
@@ -37,15 +38,13 @@ module.exports = {
         });
       })
       .then(function(citiesData) {
-        let promises = citiesData.map(function(city) {
+        return Promise.map(citiesData, (city) => {
           return geocoder.getLatLng(city.name)
             .then(function(locationObj) {
               city.location = locationObj;
               return city;
-            })
-        });
-
-        return Promise.all(promises)
+            });
+        }, { concurrency: 2 })
           .then(function(results) {
             return results;
           })
