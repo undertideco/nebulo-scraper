@@ -2,6 +2,10 @@ const fetch = require('node-fetch');
 
 const { GOOGLE_GEOCODING_API_KEY } = process.env;
 
+const makeParamsQueryString = params => Object.keys(params)
+  .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
+  .join('&');
+
 module.exports = {
   getLatLng: (cityName) => {
     const params = {
@@ -9,7 +13,7 @@ module.exports = {
       key: GOOGLE_GEOCODING_API_KEY,
     };
 
-    return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${this.makeParamsQueryString(params)}`)
+    return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(params)}`)
       .then(res => res.json())
       .then(data => data.results[0].geometry.location)
       .catch(error => console.log('geocoder request failed', error));
@@ -21,7 +25,7 @@ module.exports = {
       key: GOOGLE_GEOCODING_API_KEY,
     };
 
-    return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${this.makeParamsQueryString(params)}`)
+    return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(params)}`)
       .then(res => res.json())
       .then(data => data.results[0].address_components
         .filter(component => component.types.includes('route') ||
@@ -31,8 +35,4 @@ module.exports = {
         .join(', '))
       .catch(error => console.log('geocoder request failed', error));
   },
-
-  makeParamsQueryString: params => Object.keys(params)
-    .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
-    .join('&'),
 };
