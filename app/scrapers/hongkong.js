@@ -1,73 +1,43 @@
 const fetch = require('node-fetch');
+const Promise = require('bluebird');
 const urls = require('../constants/urls');
 const geocoder = require('../helpers/geocoder');
-const parseString = require('xml2js').parseString;
+const xml2js = require('xml2js');
 
-Array.prototype.chunk = function(length) {
-  var chunkarr = [],
-    i = 0,
-    n = this.length;
+const parseString = Promise.promisify(xml2js.parseString);
 
-  while (i < n) {
+/* eslint no-extend-native: ["error", { "exceptions": ["Array"] }] */
+/* eslint func-names: off */
+Array.prototype.chunk = function (length) {
+  const chunkarr = [];
+  let i = 0;
+
+  while (i < this.length) {
     chunkarr.push(this.slice(i, i += length));
   }
 
   return chunkarr;
-}
+};
 
-Array.prototype.last = function() {
-  return this.slice(-1)[0]
-}
+Array.prototype.last = function () {
+  return this.slice(-1)[0];
+};
 
 module.exports = {
-  scrape: () => {
-    console.log("Beginning Hong Kong Scrape...");
-    return fetch(urls.HONGKONG_URL)
-      .then((response) => {
-        return response.text();
-      })
-      .then((xml) => {
-        var regions;
-        parseString(xml, function (err, result) {
-          var resultArray = result.AQHI24HrPollutantConcentration.PollutantConcentration;
-          var newArray = resultArray.chunk(24).map((cityArray) => {
-            return cityArray.last();
-          });
-
-          regions = newArray;
-        });
-        return regions;
-      })
-      .then((json) => {
-        return json.map((city) => {
-          var pm25 = city['PM2.5'][0] === '-' ? 0 : Math.round(parseFloat(city['PM2.5'][0]));
-          return  {
-            name: city.StationName[0],
-            data: pm25
-          }
-        })
-      })
-      .then((citiesData) => {
-        let promises = citiesData.map(function(city) {
-          var cityNameLookup = `${city.name}, Hong Kong`
-          return geocoder.getLatLng(cityNameLookup)
-            .then(function(locationObj) {
-              city.location = locationObj;
-              return city;
-            })
-        });
-
-        return Promise.all(promises)
-          .then(function(results) {
-            return results;
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
-      });
-  },
-
-  parseTitleForCityName: (cityString) => {
-    return cityString.trim().split(':')
-  }
-}
+  scrape: () => fetch(urls.HONGKONG_URL)
+    .then(response => response.text())
+    .then(parseString)
+    .then(result => result.AQHI24HrPollutantConcentration.PollutantConcentration
+      .chunk(24)
+      .map(cityArray => cityArray.last()))
+    .then(json => json.map(city => ({
+      name: city.StationName[0],
+      data: city['PM2.5'][0] === '-' ? 0 : Math.round(parseFloat(city['PM2.5'][0])),
+    })))
+    .then(citiesData => Promise.map(
+      citiesData,
+      city => geocoder.getLatLng(`${city.name}, Hong Kong`)
+        .then(location => Object.assign(city, { location })),
+      { concurrency: 2 },
+    ).catch(console.error)),
+};
