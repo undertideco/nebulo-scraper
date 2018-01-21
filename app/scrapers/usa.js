@@ -28,7 +28,7 @@ module.exports = {
               city.name = address;
               return city;
             });
-        }, { concurrency: 5 })
+        }, { concurrency: 2 })
           .then(function(results) {
             return results;
           })

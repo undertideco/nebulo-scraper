@@ -29,7 +29,7 @@ module.exports = {
               city.location = locationObj;
               return city;
             });
-        }, { concurrency: 5 })
+        }, { concurrency: 2 })
           .then(function(results) {
             return results;
           })
