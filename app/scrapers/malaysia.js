@@ -1,56 +1,36 @@
 const fetch = require('node-fetch');
 const Promise = require('bluebird');
-const moment = require('moment');
-const cheerio = require('cheerio');
 const geocoder = require('../helpers/geocoder');
 const urls = require('../constants/urls');
 
-String.prototype.isEmpty = function() {
-    return (this.length === 0 || !this.trim() || this == 'n/a');
-};
+const numberRegex = /(\d+)/;
 
 module.exports = {
-  scrape: function() {
-    const numberRegex = /(\d+)/;
+  scrape: () => fetch(urls.MALAYSIA_URL)
+    .then(response => response.json())
+    .then((json) => {
+      const cities = json['24hour_api'];
+      cities.shift();
 
-    console.log("Beginning Malaysia Scrape...");
-    const _this = this;
-    return fetch(urls.MALAYSIA_URL)
-      .then((response) => {
-        return response.json();
-      })
-      .then((json) => {
-        const cities = json["24hour_api"];
-        cities.shift();
-        console.log(cities);
-        return cities.map((city) => {
-          var obj = {}
-          obj.name = `${city[1]}, ${city[0].charAt(0) + city[0].substring(1).toLowerCase()}`
-          let data = city.slice(-1)[0]
+      return cities.map((city) => {
+        const obj = {
+          name: `${city[1]}, ${city[0].charAt(0) + city[0].substring(1).toLowerCase()}`,
+          data: 0,
+        };
 
-          if (numberRegex.test(data)) {
-            obj.data = parseInt(data.match(numberRegex)[0], 10);
-          } else {
-            obj.data = 0;
-          }
+        const data = city.slice(-1)[0];
 
-          return obj;
-        });
-      })
-      .then(function(citiesData) {
-        return Promise.map(citiesData, (city) => {
-          return geocoder.getLatLng(city.name)
-            .then(function(locationObj) {
-              city.location = locationObj;
-              return city;
-            });
-        }, { concurrency: 2 })
-          .then(function(results) {
-            return results;
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
+        if (numberRegex.test(data)) {
+          obj.data = parseInt(data.match(numberRegex)[0], 10);
+        }
+
+        return obj;
       });
-  }
-}
+    })
+    .then(citiesData => Promise.map(
+      citiesData,
+      city => geocoder.getLatLng(city.name)
+        .then(location => Object.assign(city, { location })),
+      { concurrency: 2 },
+    ).catch(console.error)),
+};
