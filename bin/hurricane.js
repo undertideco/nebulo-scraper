@@ -8,36 +8,36 @@ const hk = require('../app/scrapers/hongkong');
 const usa = require('../app/scrapers/usa');
 const nl = require('../app/scrapers/netherlands');
 
-const logConsole = (...args) => {
-  console.log(args);
+const logConsole = (args) => {
+  console.log(JSON.stringify(args, null, 2));
   return args;
 };
 
 console.log('Beginning Singapore Scrape...');
 sg.scrape()
-  .then(result => result.map(logConsole))
-  .then(result => result.map(city => db.dispatchCity(city)));
+  .then(logConsole)
+  .then(result => result.map(db.dispatchCity));
 
 console.log('Beginning Malaysia Scrape...');
 my.scrape()
-  .then(result => result.map(logConsole))
-  .then(result => result.map(city => db.dispatchCity(city)));
+  .then(logConsole)
+  .then(result => result.map(db.dispatchCity));
 
 tw.scrape()
-  .then(result => result.map(logConsole))
-  .then(result => result.map(city => db.dispatchCity(city)));
+  .then(logConsole)
+  .then(result => result.map(db.dispatchCity));
 
 console.log('Beginning Hong Kong Scrape...');
 hk.scrape()
-  .then(result => result.map(logConsole))
-  .then(result => result.map(city => db.dispatchCity(city)));
+  .then(logConsole)
+  .then(result => result.map(db.dispatchCity));
 
 console.log('Beginning Netherlands Scrape...');
 nl.scrape()
-  .then(result => result.map(logConsole))
-  .then(result => result.map(city => db.dispatchCity(city)));
+  .then(logConsole)
+  .then(result => result.map(db.dispatchCity));
 
 console.log('Beginning United States of America Scrape...');
 usa.scrape()
-  .then(result => result.map(logConsole))
-  .then(result => result.map(city => db.dispatchCity(city)));
+  .then(logConsole)
+  .then(result => result.map(db.dispatchCity));

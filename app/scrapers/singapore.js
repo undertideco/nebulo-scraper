@@ -21,8 +21,8 @@ module.exports = {
     .then(regions => regions.map(region => ({
       name: codeMap[region.id[0]],
       location: {
-        lat: region.latitude[0],
-        lng: region.longitude[0],
+        lat: parseFloat(region.latitude[0]),
+        lng: parseFloat(region.longitude[0]),
       },
       data: parseInt(region.record[0].reading[0].$.value, 10),
     }))),
