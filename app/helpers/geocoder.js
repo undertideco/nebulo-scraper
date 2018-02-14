@@ -1,52 +1,38 @@
 const fetch = require('node-fetch');
+
 const { GOOGLE_GEOCODING_API_KEY } = process.env;
 
+const makeParamsQueryString = params => Object.keys(params)
+  .map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
+  .join('&');
+
 module.exports = {
-  getLatLng: function(cityName) {
-    var params = {
+  getLatLng: (cityName) => {
+    const params = {
       address: cityName,
       key: GOOGLE_GEOCODING_API_KEY,
-    }
-
-    return fetch('https://maps.googleapis.com/maps/api/geocode/json?' + this.makeParamsQueryString(params))
-      .then(function(res) {
-        return res.json();
-      })
-      .then(function(data) {
-        return data.results[0].geometry.location;
-      })
-      .catch(function(error) {
-        console.log('geocoder request failed', error)
-      });
-  },
-
-  getAddress: function(lat, lng) {
-    var params = {
-      latlng: `${lat},${lng}`,
-      key: GOOGLE_GEOCODING_API_KEY
     };
 
-    return fetch('https://maps.googleapis.com/maps/api/geocode/json?' + this.makeParamsQueryString(params))
-    .then(function(res) {
-      return res.json();
-    })
-    .then(function(data) {
-      return data.results[0].address_components
+    return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(params)}`)
+      .then(res => res.json())
+      .then(data => data.results[0].geometry.location)
+      .catch(error => console.log('geocoder request failed', error));
+  },
+
+  getAddress: (lat, lng) => {
+    const params = {
+      latlng: `${lat},${lng}`,
+      key: GOOGLE_GEOCODING_API_KEY,
+    };
+
+    return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(params)}`)
+      .then(res => res.json())
+      .then(data => data.results[0].address_components
         .filter(component => component.types.includes('route') ||
           component.types.includes('sublocality') ||
           component.types.includes('locality'))
         .map(component => component.short_name)
-        .join(', ');
-    })
-    .catch(function(error) {
-      console.log('geocoder request failed', error)
-    });
+        .join(', '))
+      .catch(error => console.log('geocoder request failed', error));
   },
-
-  makeParamsQueryString: function(params) {
-    var esc = encodeURIComponent;
-    return Object.keys(params)
-      .map(k => esc(k) + '=' + esc(params[k]))
-      .join('&');
-  }
-}
+};
