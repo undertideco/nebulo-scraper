@@ -15,6 +15,12 @@ module.exports = {
 
     return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(params)}`)
       .then(res => res.json())
+      .then((data) => {
+        if (!data.status || data.status !== 'OK') {
+          console.log(data);
+        }
+        return data;
+      })
       .then(data => data.results[0].geometry.location)
       .catch(error => console.log('geocoder request failed', error));
   },
@@ -27,6 +33,12 @@ module.exports = {
 
     return fetch(`https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(params)}`)
       .then(res => res.json())
+      .then((data) => {
+        if (!data.status || data.status !== 'OK') {
+          console.log(data);
+        }
+        return data;
+      })
       .then(data => data.results[0].address_components
         .filter(component => component.types.includes('route') ||
           component.types.includes('sublocality') ||
