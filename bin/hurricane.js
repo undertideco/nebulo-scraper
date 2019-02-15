@@ -1,4 +1,5 @@
 // !#/usr/bin/env node
+require('dotenv').config();
 const db = require('../app/db/middleware');
 
 const sg = require('../app/scrapers/singapore');
