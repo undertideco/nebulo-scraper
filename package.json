@@ -16,7 +16,7 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "cheerio": "^0.22.0",
-    "dotenv": "^2.0.0",
+    "dotenv": "^6.2.0",
     "moment": "^2.14.1",
     "node-fetch": "^1.6.0",
     "pg": "^6.1.0",
