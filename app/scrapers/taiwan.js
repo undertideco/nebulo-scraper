@@ -8,16 +8,18 @@ const geocoderExceptions = {
 };
 
 module.exports = {
-  scrape: () => fetch(urls.TAIWAN_URL)
-    .then(response => response.json())
-    .then(json => json.map(city => ({
+  scrape: async () => {
+    const json = await fetch(urls.TAIWAN_URL)
+      .then(response => response.json());
+    const cities = json.map(city => ({
       name: `${city.SiteName}, ${city.County}`,
       data: parseInt(city['PM2.5'], 10) || 0,
-    })))
-    .then(citiesData => Promise.map(
-      citiesData,
+    }));
+    return Promise.map(
+      cities,
       city => geocoder.getLatLng(geocoderExceptions[city.name] || city.name)
         .then(location => Object.assign(city, { location })),
       { concurrency: 2 },
-    ).catch(console.error)),
+    );
+  },
 };
