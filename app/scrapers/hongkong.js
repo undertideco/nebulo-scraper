@@ -24,20 +24,22 @@ Array.prototype.last = function () {
 };
 
 module.exports = {
-  scrape: () => fetch(urls.HONGKONG_URL)
-    .then(response => response.text())
-    .then(parseString)
-    .then(result => result.AQHI24HrPollutantConcentration.PollutantConcentration
+  scrape: async () => {
+    const xml = await fetch(urls.HONGKONG_URL)
+      .then(response => response.text())
+      .then(parseString);
+    const citiesRaw = xml.AQHI24HrPollutantConcentration.PollutantConcentration
       .chunk(24)
-      .map(cityArray => cityArray.last()))
-    .then(json => json.map(city => ({
+      .map(cityArray => cityArray.last());
+    const cities = citiesRaw.map(city => ({
       name: city.StationName[0],
       data: city['PM2.5'][0] === '-' ? 0 : Math.round(parseFloat(city['PM2.5'][0])),
-    })))
-    .then(citiesData => Promise.map(
-      citiesData,
+    }));
+    return Promise.map(
+      cities,
       city => geocoder.getLatLng(`${city.name}, Hong Kong`)
         .then(location => Object.assign(city, { location })),
       { concurrency: 2 },
-    ).catch(console.error)),
+    );
+  },
 };
