@@ -1,29 +1,24 @@
 const fetch = require('node-fetch');
 const urls = require('../constants/urls');
-const Promise = require('bluebird');
-const xml2js = require('xml2js');
 
-const parseString = Promise.promisify(xml2js.parseString);
-
-const codeMap = {
-  rNO: 'North, Singapore',
-  rCE: 'Central, Singapore',
-  rEA: 'East, Singapore',
-  rWE: 'West, Singapore',
-  rSO: 'South, Singapore',
-};
+/* eslint-disable camelcase */
 
 module.exports = {
-  scrape: () => fetch(urls.SINGAPORE_URL)
-    .then(response => response.text())
-    .then(parseString)
-    .then(result => result.channel.item[0].region)
-    .then(regions => regions.map(region => ({
-      name: codeMap[region.id[0]],
-      location: {
-        lat: parseFloat(region.latitude[0]),
-        lng: parseFloat(region.longitude[0]),
-      },
-      data: parseInt(region.record[0].reading[0].$.value, 10),
-    }))),
+  scrape: async () => {
+    const { region_metadata, items } = await fetch(urls.SINGAPORE_URL)
+      .then(response => response.json());
+    const locations = {};
+    region_metadata.forEach((rm) => {
+      locations[rm.name] = {
+        lat: rm.label_location.latitude,
+        lng: rm.label_location.longitude,
+      };
+    });
+    const { pm25_one_hourly } = items[0].readings;
+    return Object.keys(pm25_one_hourly).map(region => ({
+      name: `${region[0].toUpperCase() + region.substr(1)}, Singapore`,
+      data: pm25_one_hourly[region],
+      location: locations[region],
+    }));
+  },
 };
