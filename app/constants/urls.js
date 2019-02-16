@@ -9,4 +9,5 @@ module.exports = {
   TAIWAN_URL: 'http://opendata2.epa.gov.tw/AQI.json',
   USA_URL: `https://www.airnowapi.org/aq/data/?parameters=PM25&BBOX=-124.205070,28.716781,-75.337882,45.419415&dataType=A&format=application%2Fjson&verbose=0&API_KEY=${process.env.AIRNOW_KEY}`,
   NETHERLANDS_URL: 'https://api.luchtmeetnet.nl/map/list_stations?component=PM25',
+  CHINA_URL: 'http://www.cnemc.cn/getIndexData.do',
 };

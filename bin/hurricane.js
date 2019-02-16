@@ -10,6 +10,7 @@ const macau = require('../app/scrapers/macau');
 const hk = require('../app/scrapers/hongkong');
 const usa = require('../app/scrapers/usa');
 const nl = require('../app/scrapers/netherlands');
+const china = require('../app/scrapers/china');
 
 const handleCountry = async (scrapeFunc) => {
   const data = await scrapeFunc();
@@ -63,6 +64,13 @@ const run = async () => {
   console.log('[SCRAPE] Starting work on USA');
   try {
     await handleCountry(usa.scrape);
+  } catch (e) {
+    console.error(e);
+  }
+
+  console.log('[SCRAPE] Starting work on China');
+  try {
+    await handleCountry(china.scrape);
   } catch (e) {
     console.error(e);
   }
