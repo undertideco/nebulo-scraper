@@ -1,6 +1,5 @@
 // !#/usr/bin/env node
 require('dotenv').config();
-const Promise = require('bluebird');
 const db = require('../app/db/middleware');
 
 const sg = require('../app/scrapers/singapore');
@@ -15,7 +14,7 @@ const china = require('../app/scrapers/china');
 const handleCountry = async (scrapeFunc) => {
   const data = await scrapeFunc();
   console.log(JSON.stringify(data));
-  await Promise.all(data.map(db.dispatchCity));
+  await db.dispatchCities(data);
 };
 
 const run = async () => {

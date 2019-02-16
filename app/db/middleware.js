@@ -1,4 +1,5 @@
 const pg = require('pg');
+const Promise = require('bluebird');
 
 const {
   USER, PGUSER, PGHOST, PGPASSWORD, PGDATABASE, PGPORT, NODE_ENV,
@@ -42,13 +43,21 @@ module.exports = {
    * @param {Number} city.location.lng longitude
    * @param {Number} city.data air quality data
    */
-  dispatchCity: async (city) => {
-    const cityID = await getCityId(city);
+  dispatchCities: async (cities) => {
+    const client = await pool.connect();
     try {
-      await pool.query('INSERT into cities_pm25(city_id, data) VALUES($1, $2)', [cityID, city.data]);
+      await client.query('BEGIN');
+      await Promise.each(cities, async (city) => {
+        const cityID = await getCityId(city);
+        await pool.query('INSERT into cities_pm25(city_id, data) VALUES($1, $2)', [cityID, city.data]);
+      });
+      await client.query('COMMIT');
     } catch (e) {
       console.error('Could not insert new city data', e);
+      await client.query('ROLLBACK');
       throw e;
+    } finally {
+      client.release();
     }
     return null;
   },
