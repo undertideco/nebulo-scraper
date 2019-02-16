@@ -1,5 +1,6 @@
 // !#/usr/bin/env node
 require('dotenv').config();
+const Promise = require('bluebird');
 const db = require('../app/db/middleware');
 
 const sg = require('../app/scrapers/singapore');
@@ -9,36 +10,56 @@ const hk = require('../app/scrapers/hongkong');
 const usa = require('../app/scrapers/usa');
 const nl = require('../app/scrapers/netherlands');
 
-const logConsole = (args) => {
-  console.log(JSON.stringify(args));
-  return args;
+const handleCountry = async (scrapeFunc) => {
+  const data = await scrapeFunc();
+  console.log(JSON.stringify(data));
+  await Promise.all(data.map(db.dispatchCity));
 };
 
-console.log('Beginning Singapore Scrape...');
-sg.scrape()
-  .then(logConsole)
-  .then(result => result.map(db.dispatchCity));
+const run = async () => {
+  console.log('[SCRAPE] Starting work on Singapore');
+  try {
+    await handleCountry(sg.scrape);
+  } catch (e) {
+    console.error(e);
+  }
 
-console.log('Beginning Malaysia Scrape...');
-my.scrape()
-  .then(logConsole)
-  .then(result => result.map(db.dispatchCity));
+  console.log('[SCRAPE] Starting work on Malaysia');
+  try {
+    await handleCountry(my.scrape);
+  } catch (e) {
+    console.error(e);
+  }
 
-tw.scrape()
-  .then(logConsole)
-  .then(result => result.map(db.dispatchCity));
+  console.log('[SCRAPE] Starting work on Taiwan');
+  try {
+    await handleCountry(tw.scrape);
+  } catch (e) {
+    console.error(e);
+  }
 
-console.log('Beginning Hong Kong Scrape...');
-hk.scrape()
-  .then(logConsole)
-  .then(result => result.map(db.dispatchCity));
+  console.log('[SCRAPE] Starting work on Hong Kong');
+  try {
+    await handleCountry(hk.scrape);
+  } catch (e) {
+    console.error(e);
+  }
 
-console.log('Beginning Netherlands Scrape...');
-nl.scrape()
-  .then(logConsole)
-  .then(result => result.map(db.dispatchCity));
+  console.log('[SCRAPE] Starting work on Netherlands');
+  try {
+    await handleCountry(nl.scrape);
+  } catch (e) {
+    console.error(e);
+  }
 
-console.log('Beginning United States of America Scrape...');
-usa.scrape()
-  .then(logConsole)
-  .then(result => result.map(db.dispatchCity));
+  console.log('[SCRAPE] Starting work on USA');
+  try {
+    await handleCountry(usa.scrape);
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+run()
+  .then(() => db.endPool())
+  .catch(console.error);
