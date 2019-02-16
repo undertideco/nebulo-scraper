@@ -11,6 +11,8 @@ const pool = new pg.Pool({
   database: PGDATABASE || 'nebulo_dev',
   port: PGPORT || 5432,
   max: 10,
+  keepAlive: true,
+  connectionTimeoutMillis: 10000, // 10 seconds
   idleTimeoutMillis: 30000,
   ssl: NODE_ENV === 'production' ? { rejectUnauthorized: false } : null,
 });
