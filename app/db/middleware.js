@@ -1,8 +1,19 @@
 const pg = require('pg');
-const config = require('./config.json')[process.env.NODE_ENV || 'dev'];
 
-console.log(`Database config:\n${JSON.stringify(config, null, 2)}\n`);
-const pool = new pg.Pool(config);
+const {
+  USER, PGUSER, PGHOST, PGPASSWORD, PGDATABASE, PGPORT,
+} = process.env;
+
+const pool = new pg.Pool({
+  host: PGHOST || '127.0.0.1',
+  user: PGUSER || USER,
+  password: PGPASSWORD,
+  database: PGDATABASE || 'nebulo_dev',
+  port: PGPORT || 5432,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  ssl: { rejectUnauthorized: false },
+});
 
 const getCityId = async (city) => {
   const client = await pool.connect();
