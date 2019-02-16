@@ -10,7 +10,7 @@ const usa = require('../app/scrapers/usa');
 const nl = require('../app/scrapers/netherlands');
 
 const logConsole = (args) => {
-  console.log(JSON.stringify(args, null, 2));
+  console.log(JSON.stringify(args));
   return args;
 };
 
