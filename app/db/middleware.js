@@ -1,7 +1,7 @@
 const pg = require('pg');
 
 const {
-  USER, PGUSER, PGHOST, PGPASSWORD, PGDATABASE, PGPORT,
+  USER, PGUSER, PGHOST, PGPASSWORD, PGDATABASE, PGPORT, NODE_ENV,
 } = process.env;
 
 const pool = new pg.Pool({
@@ -12,7 +12,7 @@ const pool = new pg.Pool({
   port: PGPORT || 5432,
   max: 10,
   idleTimeoutMillis: 30000,
-  ssl: { rejectUnauthorized: false },
+  ssl: NODE_ENV === 'production' ? { rejectUnauthorized: false } : null,
 });
 
 const getCityId = async (city) => {
