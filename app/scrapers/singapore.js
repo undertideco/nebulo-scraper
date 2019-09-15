@@ -14,10 +14,10 @@ module.exports = {
         lng: rm.label_location.longitude,
       };
     });
-    const { pm25_one_hourly } = items[0].readings;
-    return Object.keys(pm25_one_hourly).map(region => ({
+    const { psi_twenty_four_hourly } = items[0].readings;
+    return Object.keys(psi_twenty_four_hourly).map(region => ({
       name: `${region[0].toUpperCase() + region.substr(1)}, Singapore`,
-      data: pm25_one_hourly[region],
+      data: psi_twenty_four_hourly[region],
       location: locations[region],
     }));
   },

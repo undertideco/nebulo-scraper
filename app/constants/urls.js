@@ -1,5 +1,5 @@
 module.exports = {
-  SINGAPORE_URL: 'https://api.data.gov.sg/v1/environment/pm25',
+  SINGAPORE_URL: 'https://api.data.gov.sg/v1/environment/psi',
   SINGAPORE_MANUAL_URL: 'http://www.haze.gov.sg/haze-updates/pollutant-concentrations/type/PM25-1Hr#pollutant',
   SINGAPORE_BACKUP_URL: 'http://dev.neaaws.com/psi.xml',
   MALAYSIA_URL: 'http://apims.doe.gov.my/data/public/CAQM/last24hours.json',
