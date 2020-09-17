@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.1",
+    "bluebird": "^3.7.2",
     "cheerio": "^0.22.0",
     "dotenv": "^6.2.0",
     "ioredis": "^4.17.3",
