@@ -35,7 +35,7 @@ const getPool = async (): Promise<Pool> => {
       },
       command: 'connect',
       destination: {
-        host: dbURL.host,
+        host: dbURL.hostname,
         port: parseInt(dbURL.port, 10),
       },
     });
