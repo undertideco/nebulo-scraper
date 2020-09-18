@@ -3,22 +3,10 @@ import pg from 'pg';
 
 import { City } from './models';
 
-const {
-  USER,
-  PGUSER,
-  PGHOST,
-  PGPASSWORD,
-  PGDATABASE,
-  PGPORT,
-  NODE_ENV,
-} = process.env;
+const { DATABASE_URL, NODE_ENV } = process.env;
 
 const pool = new pg.Pool({
-  host: PGHOST || '127.0.0.1',
-  user: PGUSER || USER,
-  password: PGPASSWORD,
-  database: PGDATABASE || 'nebulo_dev',
-  port: parseInt(PGPORT ?? '5432', 10),
+  connectionString: DATABASE_URL,
   max: 10,
   keepAlive: true,
   connectionTimeoutMillis: 10000, // 10 seconds
