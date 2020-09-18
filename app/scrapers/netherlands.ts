@@ -36,11 +36,16 @@ export const scrape = async (): Promise<City[]> => {
   const stations: Station[] = [];
 
   // Fetch all stations
+  let stationsPage = 1;
+
   while (true) {
-    const result = await fetch(NETHERLANDS_STATIONS_URL);
+    const result = await fetch(
+      `${NETHERLANDS_STATIONS_URL}?page=${stationsPage}`
+    );
     const json: Response<Station[]> = await result.json();
 
     stations.push(...json.data);
+    stationsPage = json.pagination.next_page;
     if (
       json.pagination.current_page === json.pagination.last_page ||
       json.data.length === 0
@@ -49,10 +54,32 @@ export const scrape = async (): Promise<City[]> => {
     }
   }
 
-  const result = await fetch(NETHERLANDS_MEASUREMENTS_URL);
-  const resp: Response<Measurement[]> = await result.json();
+  console.log('Netherlands: Retrieved', stations.length, 'stations');
 
-  const cities = resp.data.map((measurement) => ({
+  const measurements: Measurement[] = [];
+  let measurementsPage = 1;
+
+  const currentTimeEpoch = new Date().valueOf();
+  const oneHourAgoEpoch = currentTimeEpoch - 3600000;
+  const oneHourAgoISOString = new Date(oneHourAgoEpoch).toISOString();
+
+  while (true) {
+    const result = await fetch(
+      `${NETHERLANDS_MEASUREMENTS_URL}?page=${measurementsPage}&formula=PM25&start=${oneHourAgoISOString}&end=${new Date().toISOString()}`
+    );
+    const resp: Response<Measurement[]> = await result.json();
+
+    measurements.push(...resp.data);
+    measurementsPage = resp.pagination.next_page;
+    if (
+      resp.pagination.current_page === resp.pagination.last_page ||
+      resp.data.length === 0
+    ) {
+      break;
+    }
+  }
+
+  const cities = measurements.map((measurement) => ({
     name:
       stations.find((stn) => stn.number === measurement.station_number)
         ?.location ?? '',

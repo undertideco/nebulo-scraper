@@ -22,6 +22,10 @@ interface Response {
   }[];
 }
 
+const geocoderExceptions: Record<string, string> = {
+  玉树州: 'Yushu, China',
+};
+
 export const scrape = async (): Promise<City[]> => {
   const result = await fetch(CHINA_URL);
   const resp: Response = await result.json();
@@ -33,7 +37,9 @@ export const scrape = async (): Promise<City[]> => {
   return Bluebird.map(
     cities,
     async (city) => {
-      const location = await getLatLng(city.name);
+      const location = await getLatLng(
+        geocoderExceptions[city.name] ?? city.name
+      );
       return { ...city, location };
     },
     { concurrency: 2 }

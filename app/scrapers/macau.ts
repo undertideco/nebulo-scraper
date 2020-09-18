@@ -56,7 +56,7 @@ export const scrape = async (): Promise<City[]> => {
 
   const cities: City[] = Object.keys(locations).map((key) => ({
     ...locations[key as StationKey],
-    data: parseFloat(resp[key as StationKey].HE_PM2_5 ?? '0'),
+    data: Math.round(parseFloat(resp[key as StationKey].HE_PM2_5 ?? '0')),
   }));
 
   return cities;

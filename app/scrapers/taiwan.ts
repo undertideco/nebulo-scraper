@@ -45,10 +45,12 @@ export const scrape = async (): Promise<City[]> => {
   }));
   return Bluebird.map(
     cities,
-    (city) =>
-      getLatLng(geocoderExceptions[city.name] ?? city.name).then((location) =>
-        Object.assign(city, { location })
-      ),
+    async (city) => {
+      const location = await getLatLng(
+        geocoderExceptions[city.name] ?? city.name
+      );
+      return { ...city, location };
+    },
     { concurrency: 2 }
   );
 };
