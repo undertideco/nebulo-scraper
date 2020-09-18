@@ -34,7 +34,7 @@ export const getLatLng = async (
     )}`
   ).then((res) => res.json());
   if (!freshResult.status || freshResult.status !== 'OK') {
-    console.log(freshResult);
+    console.log('Error getting coordinates for', cityName, freshResult);
     redisClient.quit();
     throw new Error('Google API status not ok');
   }
