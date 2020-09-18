@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.32",
+    "@types/dotenv": "^8.2.0",
     "@types/ioredis": "^4.17.4",
     "@types/lodash": "^4.14.161",
     "@types/node": "^14.10.3",
