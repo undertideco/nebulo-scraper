@@ -1,20 +1,64 @@
 import Bluebird from 'bluebird';
-import pg from 'pg';
+import pg, { Pool } from 'pg';
+import { SocksClient } from 'socks';
+import { Duplex } from 'stream';
 
 import { City } from './models';
 
-const { DATABASE_URL, NODE_ENV } = process.env;
+const { DATABASE_URL, NODE_ENV, FIXIE_SOCKS_HOST } = process.env;
 
-const pool = new pg.Pool({
-  connectionString: DATABASE_URL,
-  max: 10,
-  keepAlive: true,
-  connectionTimeoutMillis: 10000, // 10 seconds
-  idleTimeoutMillis: 30000,
-  ssl: NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
-});
+let cachedPool: Pool | null = null;
+
+const getPool = async (): Promise<Pool> => {
+  if (cachedPool !== null) {
+    return cachedPool;
+  }
+
+  let stream: Duplex | undefined = undefined;
+
+  if (!DATABASE_URL) {
+    throw new Error('Missing DATABASE_URL');
+  }
+
+  if (FIXIE_SOCKS_HOST) {
+    const fixieValues = FIXIE_SOCKS_HOST.split(new RegExp('[/(:\\/@)/]+'));
+
+    const dbURL = new URL(DATABASE_URL);
+
+    const conn = await SocksClient.createConnection({
+      proxy: {
+        type: 5,
+        userId: fixieValues[0],
+        password: fixieValues[1],
+        host: fixieValues[2],
+        port: parseInt(fixieValues[3], 10),
+      },
+      command: 'connect',
+      destination: {
+        host: dbURL.host,
+        port: parseInt(dbURL.port, 10),
+      },
+    });
+    stream = conn.socket;
+  }
+
+  const pool = new pg.Pool({
+    connectionString: DATABASE_URL,
+    max: 10,
+    keepAlive: true,
+    connectionTimeoutMillis: 10000, // 10 seconds
+    idleTimeoutMillis: 30000,
+    stream,
+    ssl: NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
+  });
+
+  cachedPool = pool;
+
+  return pool;
+};
 
 const getCityId = async (city: City) => {
+  const pool = await getPool();
   const queryResult = await pool.query('SELECT * FROM cities WHERE name = $1', [
     city.name,
   ]);
@@ -36,6 +80,7 @@ const getCityId = async (city: City) => {
 };
 
 export const dispatchCities = async (cities: City[]): Promise<void> => {
+  const pool = await getPool();
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -56,4 +101,6 @@ export const dispatchCities = async (cities: City[]): Promise<void> => {
   }
 };
 
-export const endPool = (): Promise<void> => pool.end();
+export const endPool = async (): Promise<void> => {
+  await cachedPool?.end();
+};
