@@ -6,4 +6,4 @@ COPY yarn.lock .
 
 RUN yarn install
 
-CMD ["yarn", "start"]
+CMD ["yarn", "start:dev"]
