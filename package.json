@@ -14,7 +14,7 @@
   "dependencies": {
     "bluebird": "^3.7.2",
     "cheerio": "^0.22.0",
-    "dotenv": "^6.2.0",
+    "dotenv": "^8.2.0",
     "ioredis": "^4.17.3",
     "lodash": "^4.17.20",
     "moment": "^2.14.1",
