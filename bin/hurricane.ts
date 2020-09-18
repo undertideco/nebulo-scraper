@@ -18,7 +18,9 @@ const run = async () => {
     const { scrape } = await import(path.join(scrapersDir, scraperFile));
 
     try {
-      await dispatchCities(await scrape());
+      const cities = await scrape();
+      await dispatchCities(cities);
+      console.log('Got', cities.length, 'cities');
     } catch (e) {
       console.error(e);
     }
