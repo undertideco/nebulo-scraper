@@ -8,6 +8,9 @@ services:
       - 'REDIS_URL=redis://@redis:6379'
     env_file:
       - '.env'
+    volumes:
+      - '.:/app'
+      - '/app/node_modules'
   postgres:
     image: postgis/postgis:12-3.0-alpine
     volumes:
