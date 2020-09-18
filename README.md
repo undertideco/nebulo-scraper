@@ -12,12 +12,9 @@ It's perhaps the most lo-fi setup ever.
 Literally. Don't. Feel free to use the scripts in [`app/scrapers`](https://github.com/undertideco/nebulo-scraper/tree/master/app/scrapers) and forget the rest.
 
 ### Development
-Requirements:
-- PostgreSQL 9.x running locally
-
-1. Update credentials in `app/db/config.json`. If you are using Homebrew's Postgres on macOS, you want to use your own username and an empty password.
-2. Run this in a terminal: `createdb nebulo_dev`.
-3. Run `yarn db:setup`.
+1. Clone the repo
+2. Copy `.env.example` to `.env` and populate the values
+3. Run `docker-compose up`. The `scraper` service will run once and terminate, which is expected (as this repo is a one-off script)
 
 #### Reset DB
 Run `yarn db:reset`
