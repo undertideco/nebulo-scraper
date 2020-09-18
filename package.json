@@ -3,30 +3,46 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "engines": {
-    "node": "11"
-  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node bin/hurricane.js",
+    "build": "tsc -outDir dist",
+    "start": "node dist/bin/hurricane.js",
+    "start:dev": "ts-node bin/hurricane.ts",
     "db:setup": "psql -f sql/init.sql nebulo_dev",
     "db:reset": "psql -f sql/reset.sql nebulo_dev"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^3.5.1",
+    "bluebird": "^3.7.2",
     "cheerio": "^0.22.0",
-    "dotenv": "^6.2.0",
+    "dotenv": "^8.2.0",
+    "ioredis": "^4.17.3",
+    "lodash": "^4.17.20",
     "moment": "^2.14.1",
-    "node-fetch": "^1.6.0",
-    "pg": "^6.1.0",
-    "redis": "^2.8.0",
-    "xml2js": "^0.4.17"
+    "node-fetch": "^2.6.1",
+    "pg": "^8.3.3",
+    "socks": "^2.4.4",
+    "typescript": "^4.0.2",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
-    "eslint": "^4.16.0",
-    "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "@types/bluebird": "^3.5.32",
+    "@types/dotenv": "^8.2.0",
+    "@types/ioredis": "^4.17.4",
+    "@types/lodash": "^4.14.161",
+    "@types/node": "^14.10.3",
+    "@types/node-fetch": "^2.5.7",
+    "@types/pg": "^7.14.5",
+    "@types/xml2js": "^0.4.5",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
+    "eslint": "^7.9.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-simple-import-sort": "^5.0.3",
+    "prettier": "^2.1.2",
+    "ts-node": "^9.0.0"
   }
 }
