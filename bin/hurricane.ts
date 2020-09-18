@@ -6,11 +6,15 @@ import { dispatchCities, endPool } from '../app/db/middleware';
 
 config();
 
+const { NODE_ENV } = process.env;
+
+const isProduction = NODE_ENV === 'production';
+
 const run = async () => {
   const scrapersDir = path.resolve(__dirname, '../app/scrapers');
-  const scrapersDirFiles = fs
-    .readdirSync(scrapersDir)
-    .filter((file) => file.endsWith('.ts'));
+  const scrapersDirFiles = fs.readdirSync(scrapersDir).filter((file) => {
+    return file.endsWith(isProduction ? '.js' : '.ts');
+  });
 
   for (const scraperFile of scrapersDirFiles) {
     console.log(`[SCRAPE] Starting work on ${scraperFile}`);
