@@ -44,7 +44,7 @@ const getPool = async (): Promise<Pool> => {
 
   const pool = new pg.Pool({
     connectionString: DATABASE_URL,
-    max: 10,
+    max: 1,
     keepAlive: true,
     connectionTimeoutMillis: 10000, // 10 seconds
     idleTimeoutMillis: 30000,
