@@ -20,7 +20,7 @@
     "ioredis": "^4.17.3",
     "lodash": "^4.17.20",
     "moment": "^2.29.4",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.7",
     "pg": "^8.3.3",
     "socks": "^2.4.4",
     "typescript": "^4.0.2",
