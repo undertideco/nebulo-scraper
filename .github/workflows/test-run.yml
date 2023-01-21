@@ -1,0 +1,35 @@
+name: Test Run
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test-run:
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: 'master'
+      - uses: actions/setup-node@v3
+        with:
+          version: 16.x
+      - run: yarn install
+      - run: yarn build
+      - name: Scrape
+        run: yarn start
+        env:
+          AIRNOW_KEY: ${{ secrets.AIRNOW_KEY }}
+          GOOGLE_GEOCODING_API_KEY: ${{ secrets.GOOGLE_GEOCODING_API_KEY }}
+          REDIS_URL: redis://localhost:6379
+      - uses: actions/upload-artifact@v3
+        with:
+          name: output
+          path: output/
+          retention-days: 7
+    services:
+      redis:
+        image: redis
+        ports:
+          - '6379:6379'
