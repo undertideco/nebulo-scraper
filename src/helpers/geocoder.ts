@@ -1,16 +1,32 @@
+import axios from 'axios';
 import Redis from 'ioredis';
-import fetch from 'node-fetch';
 
 const { REDIS_URL, GOOGLE_GEOCODING_API_KEY } = process.env;
 
-const makeParamsQueryString = (params: { [key: string]: any }) =>
-  Object.keys(params)
-    .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
-    .join('&');
+interface GeocodeResponse {
+  status: string;
+  results: {
+    address_components: {
+      long_name: string;
+      short_name: string;
+      types: string[];
+    }[];
+    geometry: {
+      location: {
+        lat: number;
+        lng: number;
+      };
+    };
+  }[];
+}
 
-export const getLatLng = async (
+export async function getLatLng(
   cityName: string
-): Promise<{ lat: number; lng: number }> => {
+): Promise<{ lat: number; lng: number }> {
+  if (GOOGLE_GEOCODING_API_KEY == null) {
+    throw new Error('No Geocoding API key provided!');
+  }
+
   const redisClient = new Redis(REDIS_URL);
   if ((await redisClient.exists(cityName)) === 1) {
     const cachedResults = await redisClient.hgetall(cityName);
@@ -21,39 +37,28 @@ export const getLatLng = async (
     };
   }
 
-  const params = {
-    address: cityName,
-    key: GOOGLE_GEOCODING_API_KEY,
-  };
+  const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
+  url.searchParams.set('address', cityName);
+  url.searchParams.set('key', GOOGLE_GEOCODING_API_KEY);
 
-  const freshResult = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(
-      params
-    )}`
-  ).then((res) => res.json());
-  if (!freshResult.status || freshResult.status !== 'OK') {
+  const freshResult = await axios.get<GeocodeResponse>(url.toString());
+
+  if (freshResult.status !== 200) {
     console.log('Error getting coordinates for', cityName, freshResult);
     redisClient.quit();
     throw new Error('Google API status not ok');
   }
-  const { lat, lng } = freshResult.results[0].geometry.location;
+  const { lat, lng } = freshResult.data.results[0].geometry.location;
   await redisClient.hmset(cityName, 'lat', lat, 'lng', lng);
   redisClient.quit();
   return { lat, lng };
-};
-
-interface GeocodeResponse {
-  status: string;
-  results: {
-    address_components: {
-      long_name: string;
-      short_name: string;
-      types: string[];
-    }[];
-  }[];
 }
 
-export const getAddress = async (lat: number, lng: number): Promise<string> => {
+export async function getAddress(lat: number, lng: number): Promise<string> {
+  if (GOOGLE_GEOCODING_API_KEY == null) {
+    throw new Error('No Geocoding API key provided!');
+  }
+
   const redisClient = new Redis(REDIS_URL);
   const redisKey = `${lat},${lng}`;
   const cachedResult = await redisClient.get(redisKey);
@@ -62,23 +67,19 @@ export const getAddress = async (lat: number, lng: number): Promise<string> => {
     return cachedResult;
   }
 
-  const params = {
-    latlng: `${lat},${lng}`,
-    key: GOOGLE_GEOCODING_API_KEY,
-  };
+  const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
+  url.searchParams.set('latlng', `${lat},${lng}`);
+  url.searchParams.set('key', GOOGLE_GEOCODING_API_KEY);
 
-  const freshResult: GeocodeResponse = await fetch(
-    `https://maps.googleapis.com/maps/api/geocode/json?${makeParamsQueryString(
-      params
-    )}`
-  ).then((res) => res.json());
+  const freshResult = await axios.get<GeocodeResponse>(url.toString());
 
-  if (!freshResult.status || freshResult.status !== 'OK') {
+  if (freshResult.status !== 200) {
     console.log(freshResult);
     redisClient.quit();
     throw new Error('Google API status not ok');
   }
-  const finalResult = freshResult.results[0].address_components
+
+  const finalResult = freshResult.data.results[0].address_components
     .filter(
       (component) =>
         component.types.includes('route') ||
@@ -91,4 +92,4 @@ export const getAddress = async (lat: number, lng: number): Promise<string> => {
 
   redisClient.quit();
   return finalResult;
-};
+}
