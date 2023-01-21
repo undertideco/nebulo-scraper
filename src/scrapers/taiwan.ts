@@ -4,37 +4,38 @@ import Bluebird from 'bluebird';
 import { USER_AGENT } from '../constants/userAgent';
 import { getLatLng } from '../helpers/geocoder';
 
-const TAIWAN_URL = 'http://opendata2.epa.gov.tw/AQI.json';
+const TAIWAN_URL =
+  'https://data.epa.gov.tw/api/v2/aqx_p_488?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=JSON';
 
 const geocoderExceptions: Record<string, string> = {
   '安南, 臺南市': '安南',
 };
 
 type Response = {
-  SiteName: string;
-  County: string;
-  AQI: string;
-  Pollutant: string;
-  Status: string;
-  SO2: string;
-  CO: string;
-  CO_8hr: string;
-  O3: string;
-  O3_8hr: string;
-  PM10: string;
-  'PM2.5': string;
-  NO2: string;
-  NOx: string;
-  NO: string;
-  WindSpeed: string;
-  WindDirec: string;
-  PublishTime: string;
-  'PM2.5_AVG': string;
-  PM10_AVG: string;
-  SO2_AVG: string;
-  Longitude: string;
-  Latitude: string;
-  SiteId: string;
+  sitename: string;
+  county: string;
+  aqi: string;
+  pollutant: string;
+  status: string;
+  so2: string;
+  co: string;
+  co_8hr: string;
+  o3: string;
+  o3_8hr: string;
+  pm10: string;
+  'pm2.5': string;
+  no2: string;
+  nox: string;
+  no: string;
+  windspeed: string;
+  winddirec: string;
+  publishtime: string;
+  'pm2.5_avg': string;
+  pm10_avg: string;
+  so2_avg: string;
+  longitude: string;
+  latitude: string;
+  siteid: string;
 }[];
 
 export default async function taiwan(): Promise<App.City[]> {
@@ -48,8 +49,8 @@ export default async function taiwan(): Promise<App.City[]> {
   return Bluebird.map(
     result.data,
     async (city): Promise<App.City> => {
-      const name = `${city.SiteName}, ${city.County}`;
-      const data = parseInt(city['PM2.5'], 10) || 0;
+      const name = `${city.sitename}, ${city.county}`;
+      const data = parseInt(city['pm2.5'], 10) || 0;
 
       const location = await getLatLng(geocoderExceptions[name] ?? name);
 
