@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+import * as fs from 'fs';
 
 import china from './scrapers/china';
 import hongKong from './scrapers/hongKong';
@@ -26,18 +27,27 @@ const SCRAPER_FUNCTIONS = [
   usa,
 ];
 
-const run = async () => {
+async function run() {
+  try {
+    fs.mkdirSync('output');
+  } catch (e) {}
+
   for (const scraperFunction of SCRAPER_FUNCTIONS) {
     console.log(`[SCRAPE] Starting work on ${scraperFunction.name}`);
 
     try {
       const cities = await scraperFunction();
       console.log(`Scraped ${cities.length} for ${scraperFunction.name}`);
+
+      fs.writeFileSync(
+        `output/${scraperFunction.name}`,
+        JSON.stringify(cities)
+      );
     } catch (e) {
       console.error(e);
     }
   }
-};
+}
 
 run()
   .then(() => {
