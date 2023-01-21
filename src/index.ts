@@ -40,7 +40,7 @@ async function run() {
       console.log(`Scraped ${cities.length} for ${scraperFunction.name}`);
 
       fs.writeFileSync(
-        `output/${scraperFunction.name}`,
+        `output/${scraperFunction.name}.json`,
         JSON.stringify(cities)
       );
     } catch (e) {
