@@ -1,8 +1,9 @@
+import axios from 'axios';
 import { capitalize, keyBy } from 'lodash';
-import fetch from 'node-fetch';
 
-import { SINGAPORE_URL } from '../constants/urls';
-import { City } from '../db/models';
+import { USER_AGENT } from '../constants/userAgent';
+
+const SINGAPORE_URL = 'https://api.data.gov.sg/v1/environment/psi';
 
 /* eslint-disable camelcase */
 interface Response {
@@ -33,19 +34,33 @@ interface Response {
   }[];
 }
 
-export const scrape = async (): Promise<City[]> => {
-  const result = await fetch(SINGAPORE_URL);
-  const resp: Response = await result.json();
-
-  const locations = keyBy(resp.region_metadata, (rm) => rm.name);
-
-  const { psi_twenty_four_hourly } = resp.items[0].readings;
-  return Object.keys(psi_twenty_four_hourly).map((region) => ({
-    name: `${capitalize(locations[region].name)}, Singapore`,
-    data: psi_twenty_four_hourly[region],
-    location: {
-      lat: locations[region].label_location.latitude,
-      lng: locations[region].label_location.longitude,
+export default async function singapore(): Promise<App.City[]> {
+  const result = await axios.get<Response>(SINGAPORE_URL, {
+    headers: {
+      'User-Agent': USER_AGENT,
+      Accept: 'application/json',
     },
-  }));
-};
+  });
+
+  const locations = keyBy(result.data.region_metadata, (rm) => rm.name);
+
+  const { psi_twenty_four_hourly } = result.data.items[0].readings;
+
+  const results: App.City[] = [];
+
+  for (const region of Object.keys(psi_twenty_four_hourly)) {
+    const city: App.City = {
+      name: `${capitalize(locations[region].name)}, Singapore`,
+      data: psi_twenty_four_hourly[region],
+      location: {
+        lat: locations[region].label_location.latitude,
+        lng: locations[region].label_location.longitude,
+      },
+      region: 'Singapore',
+    };
+
+    results.push(city);
+  }
+
+  return results;
+}

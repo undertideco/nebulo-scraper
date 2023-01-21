@@ -1,9 +1,7 @@
 import Redis from 'ioredis';
 import fetch from 'node-fetch';
 
-const { REDIS_URL } = process.env;
-
-const { GOOGLE_GEOCODING_API_KEY } = process.env;
+const { REDIS_URL, GOOGLE_GEOCODING_API_KEY } = process.env;
 
 const makeParamsQueryString = (params: { [key: string]: any }) =>
   Object.keys(params)
@@ -74,6 +72,7 @@ export const getAddress = async (lat: number, lng: number): Promise<string> => {
       params
     )}`
   ).then((res) => res.json());
+
   if (!freshResult.status || freshResult.status !== 'OK') {
     console.log(freshResult);
     redisClient.quit();

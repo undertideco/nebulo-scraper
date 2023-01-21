@@ -1,7 +1,9 @@
-import fetch from 'node-fetch';
+import axios from 'axios';
 
-import { MACAU_URL } from '../constants/urls';
-import { City } from '../db/models';
+import { USER_AGENT } from '../constants/userAgent';
+
+const MACAU_URL =
+  'https://cms.smg.gov.mo/uploads/sync/json/latestAirConcentration.json';
 
 type StationKey =
   | 'enhopolu'
@@ -50,14 +52,23 @@ interface Station {
 
 type Response = Record<StationKey, Station>;
 
-export const scrape = async (): Promise<City[]> => {
-  const result = await fetch(MACAU_URL);
-  const resp: Response = await result.json();
+export default async function macau(): Promise<App.City[]> {
+  const result = await axios.get<Response>(MACAU_URL, {
+    headers: {
+      'User-Agent': USER_AGENT,
+      Accept: 'application/json',
+    },
+  });
 
-  const cities: City[] = Object.keys(locations).map((key) => ({
-    ...locations[key as StationKey],
-    data: Math.round(parseFloat(resp[key as StationKey].HE_PM2_5 ?? '0')),
-  }));
+  return Object.keys(locations).map((key) => {
+    const city: App.City = {
+      ...locations[key as StationKey],
+      region: 'Macau',
+      data: Math.round(
+        parseFloat(result.data[key as StationKey].HE_PM2_5 ?? '0')
+      ),
+    };
 
-  return cities;
-};
+    return city;
+  });
+}

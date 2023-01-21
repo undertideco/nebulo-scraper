@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc -outDir dist",
     "start": "node dist/bin/hurricane.js",
-    "start:dev": "ts-node bin/hurricane.ts",
+    "start:dev": "ts-node src/index.ts",
     "db:setup": "psql -f sql/init.sql nebulo_dev",
     "db:reset": "psql -f sql/reset.sql nebulo_dev"
   },

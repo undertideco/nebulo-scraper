@@ -1,9 +1,10 @@
+import axios from 'axios';
 import Bluebird from 'bluebird';
-import fetch from 'node-fetch';
 
-import { TAIWAN_URL } from '../constants/urls';
-import { City } from '../db/models';
+import { USER_AGENT } from '../constants/userAgent';
 import { getLatLng } from '../helpers/geocoder';
+
+const TAIWAN_URL = 'http://opendata2.epa.gov.tw/AQI.json';
 
 const geocoderExceptions: Record<string, string> = {
   '安南, 臺南市': '安南',
@@ -36,21 +37,24 @@ type Response = {
   SiteId: string;
 }[];
 
-export const scrape = async (): Promise<City[]> => {
-  const result = await fetch(TAIWAN_URL);
-  const resp: Response = await result.json();
-  const cities = resp.map((city) => ({
-    name: `${city.SiteName}, ${city.County}`,
-    data: parseInt(city['PM2.5'], 10) || 0,
-  }));
+export default async function taiwan(): Promise<App.City[]> {
+  const result = await axios.get<Response>(TAIWAN_URL, {
+    headers: {
+      'User-Agent': USER_AGENT,
+      Accept: 'application/json',
+    },
+  });
+
   return Bluebird.map(
-    cities,
-    async (city) => {
-      const location = await getLatLng(
-        geocoderExceptions[city.name] ?? city.name
-      );
-      return { ...city, location };
+    result.data,
+    async (city): Promise<App.City> => {
+      const name = `${city.SiteName}, ${city.County}`;
+      const data = parseInt(city['PM2.5'], 10) || 0;
+
+      const location = await getLatLng(geocoderExceptions[name] ?? name);
+
+      return { name, data, region: 'Taiwan', location };
     },
     { concurrency: 2 }
   );
-};
+}
