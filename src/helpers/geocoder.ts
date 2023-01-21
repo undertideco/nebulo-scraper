@@ -27,14 +27,22 @@ export async function getLatLng(
     throw new Error('No Geocoding API key provided!');
   }
 
-  const redisClient = new Redis(REDIS_URL);
-  if ((await redisClient.exists(cityName)) === 1) {
-    const cachedResults = await redisClient.hgetall(cityName);
-    redisClient.quit();
-    return {
-      lat: Number(cachedResults.lat),
-      lng: Number(cachedResults.lng),
-    };
+  if (REDIS_URL != null) {
+    const redisClient = new Redis(REDIS_URL);
+
+    const isCached = (await redisClient.exists(cityName)) === 1;
+
+    if (isCached) {
+      const cachedResults = await redisClient.hgetall(cityName);
+      await redisClient.quit();
+
+      return {
+        lat: Number(cachedResults.lat),
+        lng: Number(cachedResults.lng),
+      };
+    } else {
+      await redisClient.quit();
+    }
   }
 
   const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
@@ -45,12 +53,17 @@ export async function getLatLng(
 
   if (freshResult.status !== 200) {
     console.log('Error getting coordinates for', cityName, freshResult);
-    redisClient.quit();
     throw new Error('Google API status not ok');
   }
+
   const { lat, lng } = freshResult.data.results[0].geometry.location;
-  await redisClient.hmset(cityName, 'lat', lat, 'lng', lng);
-  redisClient.quit();
+
+  if (REDIS_URL != null) {
+    const redisClient = new Redis(REDIS_URL);
+
+    await redisClient.hmset(cityName, 'lat', lat, 'lng', lng);
+    await redisClient.quit();
+  }
   return { lat, lng };
 }
 
@@ -59,12 +72,15 @@ export async function getAddress(lat: number, lng: number): Promise<string> {
     throw new Error('No Geocoding API key provided!');
   }
 
-  const redisClient = new Redis(REDIS_URL);
   const redisKey = `${lat},${lng}`;
-  const cachedResult = await redisClient.get(redisKey);
-  if (cachedResult !== null) {
-    redisClient.quit();
-    return cachedResult;
+
+  if (REDIS_URL != null) {
+    const redisClient = new Redis(REDIS_URL);
+    const cachedResult = await redisClient.get(redisKey);
+    if (cachedResult !== null) {
+      await redisClient.quit();
+      return cachedResult;
+    }
   }
 
   const url = new URL('https://maps.googleapis.com/maps/api/geocode/json');
@@ -75,7 +91,6 @@ export async function getAddress(lat: number, lng: number): Promise<string> {
 
   if (freshResult.status !== 200) {
     console.log(freshResult);
-    redisClient.quit();
     throw new Error('Google API status not ok');
   }
 
@@ -88,8 +103,12 @@ export async function getAddress(lat: number, lng: number): Promise<string> {
     )
     .map((component) => component.short_name)
     .join(', ');
-  await redisClient.set(redisKey, finalResult);
 
-  redisClient.quit();
+  if (REDIS_URL != null) {
+    const redisClient = new Redis(REDIS_URL);
+
+    await redisClient.set(redisKey, finalResult);
+    await redisClient.quit();
+  }
   return finalResult;
 }
