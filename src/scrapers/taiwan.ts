@@ -1,45 +1,63 @@
 import axios from 'axios';
 import Bluebird from 'bluebird';
+import { config } from 'dotenv';
 
 import { USER_AGENT } from '../constants/userAgent';
 import { getLatLng } from '../helpers/geocoder';
 
-const TAIWAN_URL =
-  'https://data.epa.gov.tw/api/v2/aqx_p_488?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=1000&sort=datacreationdate%20desc&format=JSON';
+config();
+
+const { MOENV_API_KEY } = process.env;
+
+const TAIWAN_URL = new URL('https://data.moenv.gov.tw/api/v2/aqx_p_02');
+TAIWAN_URL.searchParams.set('api_key', MOENV_API_KEY!);
 
 const geocoderExceptions: Record<string, string> = {
   '安南, 臺南市': '安南',
 };
 
-type Response = {
-  sitename: string;
+interface Root {
+  fields: Field[];
+  resource_id: string;
+  __extras: Extras;
+  include_total: boolean;
+  total: string;
+  resource_format: string;
+  limit: string;
+  offset: string;
+  _links: Links;
+  records: PM25Record[];
+}
+
+interface Field {
+  id: string;
+  type: string;
+  info: Info;
+}
+
+interface Info {
+  label: string;
+}
+
+interface Extras {
+  api_key: string;
+}
+
+interface Links {
+  start: string;
+  next: string;
+}
+
+interface PM25Record {
+  site: string;
   county: string;
-  aqi: string;
-  pollutant: string;
-  status: string;
-  so2: string;
-  co: string;
-  co_8hr: string;
-  o3: string;
-  o3_8hr: string;
-  pm10: string;
-  'pm2.5': string;
-  no2: string;
-  nox: string;
-  no: string;
-  windspeed: string;
-  winddirec: string;
-  publishtime: string;
-  'pm2.5_avg': string;
-  pm10_avg: string;
-  so2_avg: string;
-  longitude: string;
-  latitude: string;
-  siteid: string;
-}[];
+  pm25: string;
+  datacreationdate: string;
+  itemunit: string;
+}
 
 export default async function taiwan(): Promise<App.City[]> {
-  const result = await axios.get<Response>(TAIWAN_URL, {
+  const result = await axios.get<Root>(TAIWAN_URL.toString(), {
     headers: {
       'User-Agent': USER_AGENT,
       Accept: 'application/json',
@@ -47,10 +65,10 @@ export default async function taiwan(): Promise<App.City[]> {
   });
 
   return Bluebird.map(
-    result.data,
+    result.data.records,
     async (city): Promise<App.City> => {
-      const name = `${city.sitename}, ${city.county}`;
-      const data = parseInt(city['pm2.5'], 10) || 0;
+      const name = `${city.site}, ${city.county}`;
+      const data = parseInt(city.pm25, 10) || 0;
 
       const location = await getLatLng(geocoderExceptions[name] ?? name);
 
