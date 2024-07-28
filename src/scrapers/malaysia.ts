@@ -5,12 +5,12 @@ import { USER_AGENT } from '../constants/userAgent';
 import { getLatLng } from '../helpers/geocoder';
 
 const MALAYSIA_URL =
-  'http://apims.doe.gov.my/data/public/CAQM/last24hours.json';
+  'https://apims.doe.gov.my/data/public_v2/CAQM/last24hours.json';
 
 const numberRegex = /(\d+)/;
 
 interface Response {
-  '24hour_api': string[][];
+  '24hour_api_apims': string[][];
 }
 
 export default async function malaysia(): Promise<App.City[]> {
@@ -21,7 +21,7 @@ export default async function malaysia(): Promise<App.City[]> {
     },
   });
 
-  const cities = result.data['24hour_api'];
+  const cities = result.data['24hour_api_apims'];
   cities.shift(); // Discard header
 
   return Bluebird.map(
