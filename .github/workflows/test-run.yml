@@ -9,10 +9,10 @@ jobs:
   test-run:
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: 'master'
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: 16.x
       - run: yarn install
@@ -24,7 +24,7 @@ jobs:
           MOENV_API_KEY: ${{ secrets.MOENV_API_KEY }}
           GOOGLE_GEOCODING_API_KEY: ${{ secrets.GOOGLE_GEOCODING_API_KEY }}
           REDIS_URL: redis://localhost:6379
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: output
           path: output/
