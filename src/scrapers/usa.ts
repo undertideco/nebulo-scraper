@@ -1,8 +1,11 @@
 import axios from 'axios';
 import Bluebird from 'bluebird';
+import { config } from 'dotenv';
 
 import { USER_AGENT } from '../constants/userAgent';
 import { getAddress } from '../helpers/geocoder';
+
+config();
 
 const { AIRNOW_KEY } = process.env;
 
