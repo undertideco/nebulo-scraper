@@ -21,6 +21,7 @@ jobs:
         run: yarn start
         env:
           AIRNOW_KEY: ${{ secrets.AIRNOW_KEY }}
+          MOENV_API_KEY: ${{ secrets.MOENV_API_KEY }}
           GOOGLE_GEOCODING_API_KEY: ${{ secrets.GOOGLE_GEOCODING_API_KEY }}
           REDIS_URL: redis://localhost:6379
       - uses: actions/upload-artifact@v3
