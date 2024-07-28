@@ -43,3 +43,4 @@ jspm_packages
 .env
 dist/
 
+output/
