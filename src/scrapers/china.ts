@@ -37,12 +37,24 @@ export default async function china(): Promise<App.City[]> {
     },
   });
 
+  console.log('Scraped', result.data.airList.length, 'for China');
+
   return Bluebird.map(
     result.data.airList,
     async (cityDataPoint): Promise<App.City> => {
-      const location = await getLatLng(
-        geocoderExceptions[cityDataPoint.CITYNAME] ?? cityDataPoint.CITYNAME
-      );
+      let location: App.City['location'] = {
+        lat: 0,
+        lng: 0,
+      };
+
+      try {
+        location = await getLatLng(
+          geocoderExceptions[cityDataPoint.CITYNAME] ?? cityDataPoint.CITYNAME
+        );
+      } catch (e) {
+        console.error(e);
+        console.log('Using dummy location for', cityDataPoint.CITYNAME);
+      }
 
       return {
         name: cityDataPoint.CITYNAME,
