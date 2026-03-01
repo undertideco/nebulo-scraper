@@ -21,8 +21,7 @@
     "ioredis": "^5.10.0",
     "lodash": "^4.17.23",
     "moment": "^2.29.4",
-    "typescript": "^5.9.3",
-    "xml2js": "^0.4.23"
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
