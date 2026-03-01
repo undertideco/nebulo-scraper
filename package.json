@@ -30,7 +30,6 @@
     "@types/ioredis": "^5.0.0",
     "@types/lodash": "^4.17.24",
     "@types/node": "16",
-    "@types/xml2js": "^0.4.5",
     "ts-node": "^10.9.2"
   }
 }
