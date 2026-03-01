@@ -1,4 +1,6 @@
 import { config } from 'dotenv';
+config();
+
 import * as fs from 'fs';
 
 import china from './scrapers/china';
@@ -9,8 +11,6 @@ import netherlands from './scrapers/netherlands';
 import singapore from './scrapers/singapore';
 import taiwan from './scrapers/taiwan';
 import usa from './scrapers/usa';
-
-config();
 
 const { NODE_ENV } = process.env;
 
