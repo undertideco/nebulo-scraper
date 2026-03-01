@@ -29,7 +29,7 @@ export default async function usa(): Promise<App.City[]> {
     },
   });
 
-  return Bluebird.map(
+  const cities = await Bluebird.map(
     result.data,
     async (city): Promise<App.City> => {
       const address = await getAddress(city.Latitude, city.Longitude);
@@ -46,4 +46,6 @@ export default async function usa(): Promise<App.City[]> {
     },
     { concurrency: 2 },
   );
+
+  return cities.filter((city) => city.name.trim() !== '');
 }
