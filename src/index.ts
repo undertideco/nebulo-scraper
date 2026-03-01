@@ -32,21 +32,26 @@ async function run() {
     fs.mkdirSync('output');
   } catch (e) {}
 
+  const cities: App.City[] = [];
+
   for (const scraperFunction of SCRAPER_FUNCTIONS) {
     console.log(`[SCRAPE] Starting work on ${scraperFunction.name}`);
 
     try {
-      const cities = await scraperFunction();
-      console.log(`Scraped ${cities.length} for ${scraperFunction.name}`);
+      const newCities = await scraperFunction();
+      cities.push(...newCities);
+      console.log(`Scraped ${newCities.length} for ${scraperFunction.name}`);
 
       fs.writeFileSync(
         `output/${scraperFunction.name}.json`,
-        JSON.stringify(cities),
+        JSON.stringify(newCities),
       );
     } catch (e) {
       console.error(e);
     }
   }
+
+  fs.writeFileSync('output/_all.json', JSON.stringify(cities));
 }
 
 run()
