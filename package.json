@@ -28,7 +28,7 @@
     "@types/bluebird": "^3.5.32",
     "@types/dotenv": "^8.2.0",
     "@types/ioredis": "^4.17.4",
-    "@types/lodash": "^4.14.161",
+    "@types/lodash": "^4.17.24",
     "@types/node": "16",
     "@types/xml2js": "^0.4.5",
     "ts-node": "^10.9.2"
