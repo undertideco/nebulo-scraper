@@ -24,6 +24,7 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.4",
     "@types/bluebird": "^3.5.32",
     "@types/dotenv": "^8.2.0",
     "@types/ioredis": "^4.17.4",
