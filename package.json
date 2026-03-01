@@ -29,6 +29,7 @@
     "@types/dotenv": "^8.2.0",
     "@types/ioredis": "^5.0.0",
     "@types/lodash": "^4.17.24",
-    "@types/node": "16"
+    "@types/node": "16",
+    "tsx": "^4.21.0"
   }
 }
