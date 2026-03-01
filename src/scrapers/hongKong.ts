@@ -1,10 +1,10 @@
 import axios from 'axios';
 import Bluebird from 'bluebird';
 import { uniqBy } from 'lodash';
-import { Parser } from 'xml2js';
 
 import { USER_AGENT } from '../constants/userAgent';
 import { getLatLng } from '../helpers/geocoder';
+import { XMLParser } from 'fast-xml-parser';
 
 const HONGKONG_URL = 'http://www.aqhi.gov.hk/epd/ddata/html/out/24pc_Eng.xml';
 
@@ -21,22 +21,15 @@ interface Response {
   };
 }
 
-const parser = new Parser({
-  explicitArray: false,
-  mergeAttrs: true,
-});
+const parser = new XMLParser();
 
-const parseStringPromise = Bluebird.promisify(parser.parseString, {
-  context: parser,
-});
 export default async function hongKong(): Promise<App.City[]> {
   const result = await axios.get<string>(HONGKONG_URL, {
     headers: {
       'User-Agent': USER_AGENT,
     },
   });
-  // @ts-ignore
-  const resp: Response = (await parseStringPromise(result.data)) as Response;
+  const resp: Response = parser.parse(result.data) as Response;
   const citiesRaw = resp.AQHI24HrPollutantConcentration.PollutantConcentration;
   citiesRaw.reverse(); // For latest value to be first
 
