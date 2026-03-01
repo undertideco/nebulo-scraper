@@ -1,8 +1,6 @@
 import axios from 'axios';
 import Redis from 'ioredis';
 
-const { REDIS_URL, GOOGLE_GEOCODING_API_KEY } = process.env;
-
 interface GeocodeResponse {
   status: string;
   results: {
@@ -23,6 +21,8 @@ interface GeocodeResponse {
 export async function getLatLng(
   cityName: string,
 ): Promise<{ lat: number; lng: number }> {
+  const { REDIS_URL, GOOGLE_GEOCODING_API_KEY } = process.env;
+
   if (GOOGLE_GEOCODING_API_KEY == null) {
     throw new Error('No Geocoding API key provided!');
   }
@@ -68,6 +68,8 @@ export async function getLatLng(
 }
 
 export async function getAddress(lat: number, lng: number): Promise<string> {
+  const { REDIS_URL, GOOGLE_GEOCODING_API_KEY } = process.env;
+
   if (GOOGLE_GEOCODING_API_KEY == null) {
     throw new Error('No Geocoding API key provided!');
   }
