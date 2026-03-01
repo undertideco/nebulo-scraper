@@ -4,16 +4,17 @@
 
 This is the web scraper our app [Nebulo](https://nebulo.undertide.co) uses to scrape air quality data.
 
-It's built to run off Heroku with a scheduled task `yarn start`.
+It's built to run off Heroku with a scheduled task `npm start`.
 
 It's perhaps the most lo-fi setup ever.
 
 ## Usage
-Run `yarn start`, which will create a bunch of JSON files in the `output/` directory.
+Run `npm install` and then `npm start`, which will create a bunch of JSON files in the `output/` directory.
 
 ### Development
 1. Clone the repo
-2. Copy `.env.example` to `.env` and populate the values
+2. Run `npm install`
+3. Copy `.env.example` to `.env` and populate the values
 
 ## Questions?
 Feel free to create an issue.
