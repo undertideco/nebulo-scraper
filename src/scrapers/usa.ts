@@ -44,6 +44,6 @@ export default async function usa(): Promise<App.City[]> {
         region: 'United States of America',
       };
     },
-    { concurrency: 2 }
+    { concurrency: 2 },
   );
 }

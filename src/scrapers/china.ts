@@ -49,7 +49,7 @@ export default async function china(): Promise<App.City[]> {
 
       try {
         location = await getLatLng(
-          geocoderExceptions[cityDataPoint.CITYNAME] ?? cityDataPoint.CITYNAME
+          geocoderExceptions[cityDataPoint.CITYNAME] ?? cityDataPoint.CITYNAME,
         );
       } catch (e) {
         console.error(e);
@@ -63,6 +63,6 @@ export default async function china(): Promise<App.City[]> {
         location,
       };
     },
-    { concurrency: 2 }
+    { concurrency: 2 },
   );
 }

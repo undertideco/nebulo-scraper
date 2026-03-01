@@ -42,6 +42,6 @@ export default async function malaysia(): Promise<App.City[]> {
 
       return { name, data, region: 'Malaysia', location };
     },
-    { concurrency: 2 }
+    { concurrency: 2 },
   );
 }

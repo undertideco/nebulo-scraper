@@ -21,7 +21,7 @@ interface GeocodeResponse {
 }
 
 export async function getLatLng(
-  cityName: string
+  cityName: string,
 ): Promise<{ lat: number; lng: number }> {
   if (GOOGLE_GEOCODING_API_KEY == null) {
     throw new Error('No Geocoding API key provided!');
@@ -99,7 +99,7 @@ export async function getAddress(lat: number, lng: number): Promise<string> {
       (component) =>
         component.types.includes('route') ||
         component.types.includes('sublocality') ||
-        component.types.includes('locality')
+        component.types.includes('locality'),
     )
     .map((component) => component.short_name)
     .join(', ');

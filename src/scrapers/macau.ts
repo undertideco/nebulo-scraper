@@ -65,7 +65,7 @@ export default async function macau(): Promise<App.City[]> {
       ...locations[key as StationKey],
       region: 'Macau',
       data: Math.round(
-        parseFloat(result.data[key as StationKey].HE_PM2_5 ?? '0')
+        parseFloat(result.data[key as StationKey].HE_PM2_5 ?? '0'),
       ),
     };
 

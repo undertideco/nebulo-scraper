@@ -53,6 +53,6 @@ export default async function hongKong(): Promise<App.City[]> {
         location,
       };
     },
-    { concurrency: 2 }
+    { concurrency: 2 },
   );
 }

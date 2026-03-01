@@ -74,6 +74,6 @@ export default async function taiwan(): Promise<App.City[]> {
 
       return { name, data, region: 'Taiwan', location };
     },
-    { concurrency: 2 }
+    { concurrency: 2 },
   );
 }

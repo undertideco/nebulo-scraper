@@ -41,7 +41,7 @@ async function run() {
 
       fs.writeFileSync(
         `output/${scraperFunction.name}.json`,
-        JSON.stringify(cities)
+        JSON.stringify(cities),
       );
     } catch (e) {
       console.error(e);

@@ -47,7 +47,7 @@ export default async function netherlands(): Promise<App.City[]> {
           'User-Agent': USER_AGENT,
           Accept: 'application/json',
         },
-      }
+      },
     );
 
     stations.push(...result.data.data);
@@ -78,7 +78,7 @@ export default async function netherlands(): Promise<App.City[]> {
           'User-Agent': USER_AGENT,
           Accept: 'application/json',
         },
-      }
+      },
     );
 
     measurements.push(...result.data.data);
@@ -103,6 +103,6 @@ export default async function netherlands(): Promise<App.City[]> {
 
       return { name, data, region: 'Netherlands', location };
     },
-    { concurrency: 2 }
+    { concurrency: 2 },
   );
 }
