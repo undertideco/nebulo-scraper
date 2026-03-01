@@ -1,16 +1,23 @@
 import axios from 'axios';
-import Bluebird from 'bluebird';
 
 import { USER_AGENT } from '../constants/userAgent';
-import { getLatLng } from '../helpers/geocoder';
 
 const MALAYSIA_URL =
-  'https://apims.doe.gov.my/data/public_v2/CAQM/last24hours.json';
-
-const numberRegex = /(\d+)/;
+  'https://eqms.doe.gov.my/api3/publicmapproxy/PUBLIC_DISPLAY/CAQM_MCAQM_Current_Reading/MapServer/0/query?f=json&outFields=*&returnGeometry=false&spatialRel=esriSpatialRelIntersects&where=1%3D1';
 
 interface Response {
-  '24hour_api_apims': string[][];
+  features: {
+    attributes: {
+      API: number;
+      STATION_LOCATION: string;
+      DATETIME: string;
+      LONGITUDE: number;
+      LATITUDE: number;
+      STATE_ID: number;
+      STATION_ID: string;
+      PARAM_SYMBOL: string;
+    };
+  }[];
 }
 
 export default async function malaysia(): Promise<App.City[]> {
@@ -21,27 +28,15 @@ export default async function malaysia(): Promise<App.City[]> {
     },
   });
 
-  const cities = result.data['24hour_api_apims'];
-  cities.shift(); // Discard header
-
-  return Bluebird.map(
-    cities,
-    async (city): Promise<App.City> => {
-      const name = `${city[1]}, ${
-        city[0].charAt(0) + city[0].substring(1).toLowerCase()
-      }`;
-
-      const dataRaw = city.slice(-1)[0];
-      let data = 0;
-
-      if (numberRegex.test(dataRaw)) {
-        data = parseInt(dataRaw.match(numberRegex)?.[0] ?? '0', 10);
-      }
-
-      const location = await getLatLng(name);
-
-      return { name, data, region: 'Malaysia', location };
-    },
-    { concurrency: 2 },
-  );
+  return result.data.features.map((feature) => {
+    return {
+      name: feature.attributes.STATION_LOCATION,
+      data: feature.attributes.API,
+      region: 'Malaysia',
+      location: {
+        lat: feature.attributes.LATITUDE,
+        lng: feature.attributes.LONGITUDE,
+      },
+    };
+  });
 }
