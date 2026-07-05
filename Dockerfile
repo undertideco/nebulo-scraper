@@ -1,12 +1,14 @@
-FROM node:24-alpine3.20
+FROM golang:1.26-alpine AS build
 
 WORKDIR /app
-COPY package.json .
-COPY package-lock.json .
-
-RUN npm install
-
+COPY go.mod .
 COPY . .
-RUN npm run build
 
-CMD ["npm", "run", "start"]
+RUN CGO_ENABLED=0 go build -o /nebulo-scraper ./cmd/nebulo-scraper
+
+FROM alpine:3.20
+
+WORKDIR /app
+COPY --from=build /nebulo-scraper /usr/local/bin/nebulo-scraper
+
+CMD ["nebulo-scraper"]
