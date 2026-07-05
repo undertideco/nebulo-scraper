@@ -88,6 +88,13 @@ Each scraper writes its results to `output/<scraper>.json`. All results are also
 2. Copy `.env.example` to `.env` and populate the values
 3. Run `go test ./...`
 
+### Releases
+Releases are driven by Cocogitto and the `Release` GitHub Actions workflow.
+
+For the initial stable release, run the workflow on `master` with `bump` set to `major`; with no previous tag, Cocogitto falls back to `0.0.0` and will create `v1.0.0`. A seed `v0.0.0` tag is not required. For later releases, choose `auto`, `major`, `minor`, or `patch`.
+
+Each release publishes Linux `amd64` and `arm64` CLI tarballs plus SHA-256 checksums.
+
 ## Questions?
 Feel free to create an issue.
 

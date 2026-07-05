@@ -1,0 +1,10 @@
+from_latest_tag = true
+ignore_merge_commits = true
+tag_prefix = "v"
+
+[changelog]
+path = "CHANGELOG.md"
+template = "remote"
+remote = "github.com"
+owner = "undertideco"
+repository = "nebulo-scraper"

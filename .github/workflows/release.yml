@@ -1,0 +1,101 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump to perform.
+        required: true
+        default: auto
+        type: choice
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.26.x
+
+      - name: Test
+        run: go test ./...
+
+      - name: Cocogitto release
+        id: release
+        uses: cocogitto/cocogitto-action@v4
+        with:
+          command: bump
+          args: ${{ format('--{0}', inputs.bump) }}
+          git-user: github-actions[bot]
+          git-user-email: 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Resolve release version
+        id: release_version
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          version="${{ steps.release.outputs.version }}"
+          if [[ -z "$version" ]]; then
+            echo "release version was not produced" >&2
+            exit 1
+          fi
+          if [[ "$version" != v* ]]; then
+            version="v${version}"
+          fi
+
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Linux binaries
+        env:
+          VERSION: ${{ steps.release_version.outputs.version }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+          for arch in amd64 arm64; do
+            package="nebulo-scraper_${VERSION}_linux_${arch}"
+            mkdir -p "dist/${package}"
+            CGO_ENABLED=0 GOOS=linux GOARCH="${arch}" go build -trimpath -o "dist/${package}/nebulo-scraper" ./cmd/nebulo-scraper
+            tar -C "dist/${package}" -czf "dist/${package}.tar.gz" nebulo-scraper
+            rm -rf "dist/${package}"
+          done
+
+          sha256sum dist/*.tar.gz > dist/checksums.txt
+
+      - name: Generate GitHub release notes
+        env:
+          VERSION: ${{ steps.release_version.outputs.version }}
+        run: cog changelog --at "$VERSION" -t full_hash > GITHUB_RELEASE_NOTES.md
+
+      - name: Push release commit and tag
+        env:
+          VERSION: ${{ steps.release_version.outputs.version }}
+        run: |
+          git push origin HEAD:${GITHUB_REF_NAME}
+          git push origin "$VERSION"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_version.outputs.version }}
+          body_path: GITHUB_RELEASE_NOTES.md
+          files: |
+            dist/*.tar.gz
+            dist/checksums.txt
