@@ -6,7 +6,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 go build -o /nebulo-scraper ./cmd/nebulo-scraper
 
-FROM alpine:3.20
+FROM alpine:3.24
 
 WORKDIR /app
 COPY --from=build /nebulo-scraper /usr/local/bin/nebulo-scraper
