@@ -16,8 +16,14 @@ jobs:
         with:
           go-version: 1.26.x
       - run: go test ./...
+      - uses: actions/cache@v6
+        with:
+          path: .cache/geocode/nebulo-scraper-geocode-cache.json
+          key: geocode-cache-${{ runner.os }}-${{ github.run_id }}
+          restore-keys: |
+            geocode-cache-${{ runner.os }}-
       - name: Scrape
-        run: go run ./cmd/nebulo-scraper -strict
+        run: go run ./cmd/nebulo-scraper -strict -geocode-cache .cache/geocode/nebulo-scraper-geocode-cache.json
         env:
           AIRNOW_KEY: ${{ secrets.AIRNOW_KEY }}
           MOENV_API_KEY: ${{ secrets.MOENV_API_KEY }}
