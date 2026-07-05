@@ -2,6 +2,8 @@ package sources
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/undertideco/nebulo-scraper/internal/httpclient"
 )
@@ -24,18 +26,27 @@ var macauStations = []macauStationMeta{
 }
 
 func scrapeMacau(ctx context.Context, r *Runner) ([]City, error) {
-	var resp map[string]macauStation
+	var resp map[string]json.RawMessage
 	if err := httpclient.GetJSON(ctx, r.Client, macauURL, &resp); err != nil {
 		return nil, err
 	}
 
 	cities := make([]City, 0, len(macauStations))
 	for _, station := range macauStations {
+		var reading macauStation
+		if raw, ok := resp[station.key]; ok {
+			decoded, err := decodeMacauStation(raw)
+			if err != nil {
+				return nil, fmt.Errorf("decode Macau station %q: %w", station.key, err)
+			}
+			reading = decoded
+		}
+
 		cities = append(cities, City{
 			Name:     station.name,
 			Region:   "Macau",
 			Location: station.location,
-			Data:     roundOptionalFloatStringDefault(resp[station.key].HEPM25, 0),
+			Data:     roundOptionalFloatStringDefault(reading.HEPM25, 0),
 		})
 	}
 
@@ -50,4 +61,15 @@ type macauStation struct {
 	HECO   string  `json:"HE_CO"`
 	HEO3   string  `json:"HE_O3"`
 	HESO2  string  `json:"HE_SO2"`
+}
+
+func decodeMacauStation(data json.RawMessage) (macauStation, error) {
+	var station macauStation
+	if len(data) == 0 {
+		return station, nil
+	}
+	if err := json.Unmarshal(data, &station); err != nil {
+		return macauStation{}, err
+	}
+	return station, nil
 }

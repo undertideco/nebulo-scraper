@@ -17,10 +17,15 @@ func scrapeMalaysia(ctx context.Context, r *Runner) ([]City, error) {
 	cities := make([]City, 0, len(resp.Features))
 	for _, feature := range resp.Features {
 		attrs := feature.Attributes
+		data := 0
+		if attrs.API != nil {
+			data = roundFloat(*attrs.API)
+		}
+
 		cities = append(cities, City{
 			Name:   attrs.StationLocation,
 			Region: "Malaysia",
-			Data:   attrs.API,
+			Data:   data,
 			Location: Location{
 				Lat: attrs.Latitude,
 				Lng: attrs.Longitude,
@@ -34,10 +39,10 @@ func scrapeMalaysia(ctx context.Context, r *Runner) ([]City, error) {
 type malaysiaResponse struct {
 	Features []struct {
 		Attributes struct {
-			API             int     `json:"API"`
-			StationLocation string  `json:"STATION_LOCATION"`
-			Longitude       float64 `json:"LONGITUDE"`
-			Latitude        float64 `json:"LATITUDE"`
+			API             *float64 `json:"API"`
+			StationLocation string   `json:"STATION_LOCATION"`
+			Longitude       float64  `json:"LONGITUDE"`
+			Latitude        float64  `json:"LATITUDE"`
 		} `json:"attributes"`
 	} `json:"features"`
 }
